@@ -1,0 +1,326 @@
+ode.js-Globals
+Node.js-HTTP
+Node.js-HTTP2
+Node.js-OS
+Node.js-Path
+Node.js-Process
+Node.js-Query
+Node.js-Stream
+Node.js-String
+Node.js-Timers
+Node.js-TLS/SSL
+Node.js-UDP/DataGram
+Node.js-URL
+Node.js-Utility
+Node.js-V8
+Node.js-VM
+Node.js-Zlib
+Node.js-Assert
+Node.js-Buffer
+Node.js-Console
+Node.js-Crypto
+Node.js-DNS
+Node.js-File System
+Node.js-Examples
+Node.js-Questions
+Node.js-Quiz
+Node.js-Tutorial
+Web Development
+Web Technology
+
+▲
+Related Articles
+Write an Article
+Write an Interview Experience
+Interview Preparation
+Practice @Geeksforgeeks
+Data Structures
+Algorithms
+Programming Languages
+Web Technologies
+Computer Science Subjects
+Machine Learning
+Tutorial Library
+GATE 2021
+UGC NET / ISRO
+QUIZ Section
+GeeksforGeeks Initiatives
+School Content
+How to Build Note Taking Application using Node.js ?
+
+Last Updated : 19 Jul, 2022
+Read
+Discuss
+Courses
+Practice
+Video
+In this article, we are going to create a Note Taking Application. A Note Taking Application is basically used to store information or notes in a database so that it never loses, it is just like Google Keep.
+
+Functionalities: A user can do the following things with this Note Taking Application:
+
+
+Display All Notes
+Add New Notes
+Delete Notes
+Update Notes
+Approach: We are going to use Body Parser by which we can capture user input values from the form such as Notes’ Content, and Notes’ Id, and store them in a collection. Then we are going to send the Notes to the web page using EJS. EJS is a middleware that makes it easy to send data from your server file (app.js or server.js) to a web page. We are also going to create the Delete Route for deleting notes, and an Update Route for updating the notes.
+
+Implementation: Below is the step-by-step implementation of the above approach.
+
+Step 1: Project Setup
+
+Initializes NPM: Create and Locate your project folder into the terminal & type the command
+
+npm init -y
+It initializes our node application & makes a package.json file.
+
+Install Dependencies: Locate your root project directory into the terminal and type the command
+
+npm install express ejs body-parser
+To install Express, EJS, and Body Parser as dependencies inside your project
+
+Create Server File: Create an ‘app.js’ file, inside this file require the Express Module, and create a constant ‘app’ for creating an instance of the express module, then set the EJS as the default view engine.
+
+const express = require('express');
+
+const app = express();
+app.set('view engine', 'ejs');
+Rearrange Your Directories: It is required to use ‘.ejs’ as an extension for the HTML file instead of ‘.html’ for using EJS inside it. Then you have to move every ‘.ejs’ file in the views directory inside your root directory. EJS is by default looking for ‘.ejs’ files inside the views folder.
+
+Use EJS variable: Inside your updated .ejs file, you have to use EJS Variables to receive values from your server file. You can declare variables in EJS like
+
+<%= variableName %>
+HTML
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Page Title</title>
+</head>
+  
+<body>
+    <%= variableName %>
+</body>
+  
+</html>
+Send data to a variable: Inside your server file ( app.js or index.js ), you can send an EJS file along with some data by using the render method.
+
+app.get("/", (req, res) => {
+    res.render("home", 
+        { variableName: "Hello Geeks!" })
+})
+Javascript
+const express = require('express')
+const app = express()
+app.set('view engine', 'ejs')
+  
+app.get("/", (req, res) => {
+    res.render("home", { variableName: "Hello Geeks!" })
+})
+  
+app.listen(3000, (req, res) => {
+    console.log("App is running on port 3000")
+})
+Fetching data from form to app.js: To receive input values of a form, we have to use a node package named body-parser.
+
+Install body-parser:
+
+npm install body-parser
+Require body-parser module:
+
+const bodyParser = require('body-parser')
+And then:
+
+app.use( bodyParser.json() );      
+app.use(bodyParser.urlencoded({    
+  extended: true
+}));
+Then we can handle form data using the request object.
+
+Step 2: Fetch Notes: We have an array of notes with two properties content and id.
+
+const notes = [{
+       noteId: 1,
+       noteContent: "Hey, Geeks you can add your important notes here."
+   }
+]
+Let’s send the array to our web page. In the previous step, we just sent a value to the variable, now we are sending the complete array.
+
+app.get("/", function (req, res) {
+   res.render("home", {
+       data: notes
+   })
+})
+Since it is common to have so many elements(notes) inside our array and we have to print each of them, we have to use For Each Loop to loop through every single element inside our collection and display the details in the text area field of the update form. We will display the details inside the text area of the update form, this way we can show the notes, and same time we can use it to update notes.
+
+<form action="/update" method="post">
+    <input type="number" style="display: none;" 
+            name="noteId" value="<%= element.noteId %>">
+    <textarea type="text" rows="6" cols="30" 
+            placeholder="Type Here..." name="noteContent"
+        value="<%= element.noteContent %>">
+            <%= element.noteContent %></textarea>
+    <br>
+    <button type="submit">Update</button>
+</form>
+Step 3: Update Notes: Now, let’s see how we can handle this update form in our update route inside the server file(app.js).
+
+app.post('/update', (req, res) => {
+   var noteId = req.body.noteId;
+   var noteContent = req.body.noteContent;
+   
+   notes.forEach(note => {
+       if (note.noteId == noteId) {
+           note.noteContent = noteContent;
+       }
+   })
+   res.render("home", {
+       data: notes
+   })
+})
+For updating a note, we have to create an updated route where we are going to fetch the requested note id and search for the element which has the same note id, and change the element content property to the ‘noteContent’ which we get from the update form.
+
+Step 4: Delete Notes: Updating Web Page giving a delete option: We have to create a form that sends the note id which we want to delete to the server file ‘app.js’.
+
+<form action="/delete" method="post">
+     <input type="number" style="display: none;" 
+         name="noteId" value="<%= element.noteId %>">
+     <button type="submit" 
+         style="margin: 0px 4px;">✕</button>
+</form>
+For deleting a note, we have to create a delete route where we are going to fetch the requested note id and search for the element which has the same note id, and delete the element.
+
+app.post('/delete', (req, res) => {
+   var noteId = req.body.noteId;
+   var j = 0;
+   notes.forEach(note => {
+       j = j + 1;
+       if (note.noteId == noteId) {
+           notes.splice((j - 1), 1)
+       }
+   })
+   res.render("home", {
+       data: notes
+   })
+})
+Complete Code: Below is the complete code to build Note Taking Application using Node.js:
+
+app.js
+const express = require('express')
+const bodyParser = require('body-parser')
+const notes = [{
+        noteId: 1,
+        noteContent: "Hey, Geeks you can add your important notes here."
+    }
+]
+  
+const app = express()
+  
+app.set('view engine', 'ejs')
+  
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}))
+  
+app.get("/", function (req, res) {
+    res.render("home", {
+        data: notes
+    })
+})
+  
+app.post("/", (req, res) => {
+    const noteContent = req.body.noteContent
+    const noteId = notes.length + 1;
+  
+    notes.push({
+        noteId: noteId,
+        noteContent: noteContent
+    })
+  
+    res.render("home", {
+        data: notes
+    })
+})
+  
+app.post('/update', (req, res) => {
+    var noteId = req.body.noteId;
+    var noteContent = req.body.noteContent;
+      
+    notes.forEach(note => {
+        if (note.noteId == noteId) {
+            note.noteContent = noteContent;
+        }
+    })
+    res.render("home", {
+        data: notes
+    })
+})
+  
+app.post('/delete', (req, res) => {
+    var noteId = req.body.noteId;
+  
+    var j = 0;
+    notes.forEach(note => {
+        j = j + 1;
+        if (note.noteId == noteId) {
+            notes.splice((j - 1), 1)
+        }
+    })
+  
+    res.render("home", {
+        data: notes
+    })
+})
+  
+app.listen(3000, (req, res) => {
+    console.log("App is running on port 3000")
+})
+home.ejs
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <title>Note Keeper</title>
+</head>
+  
+<body>
+    <h1>Note Keeper</h1>
+  
+    <div style="display: flex;">
+  
+        <% data.forEach(element=> { %>
+  
+            <form action="/update" method="post">
+                <input type="number" style="display: none;" 
+                       name="noteId" value="<%= element.noteId %>">
+                <textarea type="text" rows="6" cols="30" 
+                          placeholder="Type Here..." name="noteContent"
+                    value="<%= element.noteContent %>">
+                      <%= element.noteContent %></textarea>
+                <br>
+                <button type="submit">Update</button>
+            </form>
+  
+            <form action="/delete" method="post">
+                <input type="number" style="display: none;" 
+                       name="noteId" value="<%= element.noteId %>">
+                <button type="submit" 
+                        style="margin: 0px 4px;">✕</button>
+            </form>
+            <% }) %>
+    </div>
+  
+    <h1>Add Note</h1>
+    <form action="/" method="post">
+        <input type="number" style="display: none;" 
+               name="noteId">
+        <textarea type="text" rows="6" cols="30" 
+                  placeholder="Type Here..." 
+                  name="noteContent"></textarea>
+        <br>
+        <button type="submit">Add</button>
+    </form>
+</body>
+  
+</html>
